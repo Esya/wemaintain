@@ -1,0 +1,39 @@
+version: "3.1"
+
+volumes:
+    db-data:
+
+services:
+    mysql:
+      image: mysql:5.6
+      container_name: mysql
+      working_dir: /application
+      volumes:
+        - db-data:/application
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=events
+        - MYSQL_USER=user
+        - MYSQL_PASSWORD=password
+      ports:
+        - "8306:3306"
+    webserver:
+      image: nginx:alpine
+      container_name: webserver
+      working_dir: /application
+      volumes:
+        - .:/application
+        - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+        - "8000:80"
+    php-fpm:
+      build: docker/php-fpm
+      container_name: php-fpm
+      working_dir: /application
+      volumes:
+        - .:/application
+    adminer:
+      image: adminer
+      container_name: adminer
+      ports:
+        - "8080:8080"
